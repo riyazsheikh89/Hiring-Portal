@@ -90,7 +90,6 @@ export const uploadResume = async (req, res) => {
                 });
             } else {
                 const user = await userService.getUserById(req.body.id);
-                console.log(user);
                 user.resume = req.file.location;
                 await user.save();
                 return res.status(201).json({

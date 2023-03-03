@@ -1,7 +1,10 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const connect = async () => {
-    mongoose.connect('mongodb+srv://riyaz-atlas:mD7XpJdKm8Ch0q0K@atlas-cluster.6xi3y9g.mongodb.net/Hiring-Portal');
+    mongoose.connect(process.env.ATLAS_URI);
 }
 
 export default connect;
