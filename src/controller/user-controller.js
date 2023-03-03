@@ -45,3 +45,23 @@ export const login = async (req, res) => {
         });
     }
 }
+
+
+export const getAllUser = async (req, res) => {
+    try {
+        const users = await userService.getUserByType(req.body);
+        return res.status(200).json({
+            success: true,
+            message: 'successfully fetched all users',
+            data: users,
+            err: {}
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Something went wrong with getting all, at user-controller layer!',
+            data: {},
+            err: error
+        });
+    }
+}

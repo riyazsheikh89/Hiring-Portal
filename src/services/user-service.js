@@ -34,10 +34,20 @@ class UserService {
                 throw {message: 'Oops! incorrect password'};
             }
 
+            // if the user is found with the given email, then generate a token for the user
             const token = user.genJWT();
             return token;
         } catch (error) {
             throw error;
+        }
+    }
+
+    async getUserByType(data) {
+        try {
+            const users = await this.userRepository.getAll(data);
+            return users;
+        } catch (error) {
+            console.log(error);
         }
     }
 }

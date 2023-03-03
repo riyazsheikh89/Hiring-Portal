@@ -33,9 +33,9 @@ class CrudRepository {
         }
     }
 
-    async getAll() {
+    async getAll(data) {
         try {
-            const result = await this.model.find({});
+            const result = await this.model.find({empType: data.type});
             return result;
         } catch (error) {
             console.log('Oops! Something went wrong at CRUD repo');
