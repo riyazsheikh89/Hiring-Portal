@@ -53,7 +53,7 @@ class UserService {
 
     async getUserById(data) {
         try {
-            const user = await this.userRepository.findBy(data);
+            const user = await this.userRepository.findById(data);
             return user;
         } catch (error) {
             console.log(error);

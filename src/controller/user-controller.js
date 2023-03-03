@@ -95,7 +95,7 @@ export const uploadResume = async (req, res) => {
                 await user.save();
                 return res.status(201).json({
                     success: true,
-                    message: 'Successfully created a new tweet',
+                    message: 'Successfully uploaded your resmue',
                     data: user,
                     err: {}
                 });
@@ -111,3 +111,23 @@ export const uploadResume = async (req, res) => {
         });
     }
 }
+
+
+export const getUser = async (req, res) => {
+    try {
+        const user = await userService.getUserById(req.body.id);
+        return res.status(200).json({
+            success: true,
+            message: 'successfully fetched the users',
+            data: user,
+            err: {}
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Something went wrong with getting all, at user-controller layer!',
+            data: {},
+            err: error
+        });
+    }
+} 
