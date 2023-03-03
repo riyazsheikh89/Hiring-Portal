@@ -6,7 +6,7 @@ const ExtractJwt = JWT.ExtractJwt;
 
 const ops = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: 'twitter_key'
+    secretOrKey: 'digibox_key'
 }
 
 export const passportAuth = (passport) => {

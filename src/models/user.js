@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     password: {
         type: String,
@@ -19,6 +20,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['recruiter', 'candidate'],
         required: true
+    },
+    resume: {
+        type: String
     }
 
 }, {timestamps: true});
@@ -41,7 +45,7 @@ userSchema.methods.comparePassword = function compare(password) {
 
 // this method generates unique json web token for user authentication
 userSchema.methods.genJWT = function generate() {
-    return jwt.sign({id: this._id, email: this.email}, 'digibox_key', {expiresIn: '1h'});
+    return jwt.sign({id: this._id, email: this.email}, 'digibox_key', {expiresIn: '1D'});
 }
 
 const User = mongoose.model('User', userSchema);

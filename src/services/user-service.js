@@ -50,6 +50,15 @@ class UserService {
             console.log(error);
         }
     }
+
+    async getUserById(data) {
+        try {
+            const user = await this.userRepository.findBy(data);
+            return user;
+        } catch (error) {
+            console.log(error);
+        }
+    }
 }
 
 export default UserService;
