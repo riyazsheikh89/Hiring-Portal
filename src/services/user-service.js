@@ -31,7 +31,6 @@ class UserService {
             }
             
             if(!user.comparePassword(data.password)) {
-                console.log(data.password, " - ", user.password);
                 throw {message: 'Oops! incorrect password'};
             }
 
