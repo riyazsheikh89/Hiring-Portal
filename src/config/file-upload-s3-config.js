@@ -19,9 +19,13 @@ const upload = multer({
             cb(null, {fieldName: file.fieldname})
         },
         key: function(req, file, cb) {
-            cb(null, Date.now().toString())
+            cb(null, file.originalname.replace(/ /g,''));    
+            //stored s3 file name will be the original name with no white space
         }
     })
 });
 
-export default upload;
+export {
+    upload,
+    s3
+}
