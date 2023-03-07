@@ -1,18 +1,28 @@
 import UserService from '../services/user-service.js';
-import upload from '../config/file-upload-s3-config.js';
+import { upload, s3 } from '../config/file-upload-s3-config.js';
 
-const singleUploader = upload.single('pdf');
+const singleUploader = upload.single('resume');
 
 const userService = new UserService();
 
 export const signUp = async (req, res) => {
     try {
+        // sign-up for the recruiter
+        if (req.body.type === 'recruiter') {
+            if (req.body.passcode === process.env.PASSCODE) {
+                console.log('Valid Passcode');
+            } else {
+                throw ({message: "Invalide Passcode! Please try again."});
+            }
+        }
+
         const response = await userService.signUp({
             name: req.body.name,
             email: req.body.email,
             password: req.body.password,
             empType: req.body.type
         });
+
         return res.status(201).json({
             success: true,
             data: response,
@@ -23,7 +33,7 @@ export const signUp = async (req, res) => {
         return res.status(500).json({
             success: false,
             data: {},
-            message: `Something went wrong with signUp, at user-controller!: ${error.message}`,
+            message: "Something went wrong with signUp, at user-controller!",
             err: error
         });
     }
@@ -35,16 +45,16 @@ export const login = async (req, res) => {
         let isRecruiter = false;
         if (req.body.type == 'recruiter') {
             isRecruiter = true;
-            const token = await userService.logIn(req.body);
         }
         const token = await userService.logIn(req.body);
+
         return res.status(200).json({
             success: true,
             message: 'Successfully logged in',
             isRecruiter: isRecruiter,
             data: token,
             err: {}
-        })
+        });
     } catch (error) {
         return res.status(500).json({
             success: false,
@@ -78,28 +88,29 @@ export const getAllUser = async (req, res) => {
 
 export const uploadResume = async (req, res) => {
     try {
-        singleUploader(req, res, async function(err, data) {
+        const user = await userService.getUserById(req.params.id);
+
+        singleUploader(req, res, async (err) => {
             if (err) {
-                return res.status(500).json({error: err});
+                throw (err);
+            }
+            // if the user already has a resume, then delete that one and upload the latest one
+            if(user.resume) {
+                let str = user.resume;
+                let len = str.length;
+                const fileName = str.substring(55, len);
+                await s3.deleteObject({Bucket: process.env.BUCKET_NAME, Key: fileName}).promise();
+                console.log("Deleted previous resume!");
             }
 
-            if(req.file === undefined) { // if there is no pdf file
-                
-                return res.status(201).json({
-                    message: 'Please select a file'
-                });
-            } else {
-                const user = await userService.getUserById(req.body.id);
-                user.resume = req.file.location;
-                await user.save();
-                return res.status(201).json({
-                    success: true,
-                    message: 'Successfully uploaded your resmue',
-                    data: user,
-                    err: {}
-                });
-            }
-
+            user.resume = req.file.location;
+            await user.save();
+        });
+        return res.status(201).json({
+            success: true,
+            message: 'Successfully uploaded your resmue',
+            data: user,
+            err: {}
         });
     } catch (error) {
         return res.status(500).json({
