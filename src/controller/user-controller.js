@@ -1,5 +1,6 @@
 import UserService from '../services/user-service.js';
 import { upload, s3 } from '../config/file-upload-s3-config.js';
+import jwt from 'jsonwebtoken';
 
 const singleUploader = upload.single('resume');
 
@@ -42,11 +43,13 @@ export const signUp = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
+        const token = await userService.logIn(req.body);
+        // jwt.verify() -> verify the token, and extract the details from it
+        var decodedClaims = jwt.verify(token, `${process.env.JWT_SECRET_KEY}`);
         let isRecruiter = false;
-        if (req.body.type == 'recruiter') {
+        if (decodedClaims.type === 'recruiter') {
             isRecruiter = true;
         }
-        const token = await userService.logIn(req.body);
 
         return res.status(200).json({
             success: true,

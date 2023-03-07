@@ -8,8 +8,9 @@ const router = express.Router();
 
 router.post('/signup', signUp);  
 router.post('/login', login);
+router.post('/upload/:id', authenticate, uploadResume);
+
 router.get('/users', getAllUser);
-router.post('/upload/:id', uploadResume);
 router.get('/getuser', getUser);
 
 

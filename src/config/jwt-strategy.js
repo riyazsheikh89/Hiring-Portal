@@ -6,7 +6,7 @@ const ExtractJwt = JWT.ExtractJwt;
 
 const ops = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: 'digibox_key'
+    secretOrKey: `${process.env.JWT_SECRET_KEY}`
 }
 
 export const passportAuth = (passport) => {

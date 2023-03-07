@@ -45,7 +45,11 @@ userSchema.methods.comparePassword = function compare(password) {
 
 // this method generates unique json web token for user authentication
 userSchema.methods.genJWT = function generate() {
-    return jwt.sign({id: this._id, email: this.email}, 'digibox_key', {expiresIn: '1D'});
+    return jwt.sign({
+        id: this._id, 
+        email: this.email,
+        type: this.empType
+    }, `${process.env.JWT_SECRET_KEY}`, {expiresIn: '1D'});
 }
 
 const User = mongoose.model('User', userSchema);
