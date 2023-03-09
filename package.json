@@ -21,6 +21,7 @@
     "multer-s3": "^2.10.0",
     "nodemon": "^2.0.21",
     "passport": "^0.6.0",
-    "passport-jwt": "^4.0.1"
+    "passport-jwt": "^4.0.1",
+    "pm2": "^5.2.2"
   }
 }
