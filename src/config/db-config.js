@@ -1,10 +1,8 @@
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { ATLAS_URI } from '../config/env-variables.js';
 
 const connect = async () => {
-    mongoose.connect(process.env.ATLAS_URI);
+    mongoose.connect(ATLAS_URI);
 }
 
 export default connect;

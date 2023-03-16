@@ -1,12 +1,15 @@
 import JWT from 'passport-jwt';
 import User from '../models/user.js';
 
+import { JWT_SECRET_KEY } from '../config/env-variables.js';
+
+
 const JwtStrategy = JWT.Strategy;
 const ExtractJwt = JWT.ExtractJwt;
 
 const ops = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: `${process.env.JWT_SECRET_KEY}`
+    secretOrKey: JWT_SECRET_KEY
 }
 
 export const passportAuth = (passport) => {

@@ -1,6 +1,9 @@
+import jwt from 'jsonwebtoken';
+
 import UserService from '../services/user-service.js';
 import { upload, s3 } from '../config/file-upload-s3-config.js';
-import jwt from 'jsonwebtoken';
+import { PASSCODE, JWT_SECRET_KEY, BUCKET_NAME } from '../config/env-variables.js';
+
 
 const singleUploader = upload.single('resume');
 
@@ -10,9 +13,7 @@ export const signUp = async (req, res) => {
     try {
         // sign-up for the recruiter
         if (req.body.type === 'recruiter') {
-            if (req.body.passcode === process.env.PASSCODE) {
-                console.log('Valid Passcode');
-            } else {
+            if (req.body.passcode != PASSCODE) {
                 throw ({message: "Invalide Passcode! Please try again."});
             }
         }
@@ -45,7 +46,7 @@ export const login = async (req, res) => {
     try {
         const token = await userService.logIn(req.body);
         // jwt.verify() -> verify the token, and extract the details from it
-        var decodedClaims = jwt.verify(token, `${process.env.JWT_SECRET_KEY}`);
+        var decodedClaims = jwt.verify(token, JWT_SECRET_KEY);
         let isRecruiter = false;
         if (decodedClaims.type === 'recruiter') {
             isRecruiter = true;
@@ -71,6 +72,9 @@ export const login = async (req, res) => {
 
 export const getAllUser = async (req, res) => {
     try {
+        if (req.user.empType != 'recruiter') {
+            throw ({message: "You are not authorised to access all the users!"});
+        }
         const users = await userService.getUserByType(req.body);
         return res.status(200).json({
             success: true,
@@ -91,34 +95,37 @@ export const getAllUser = async (req, res) => {
 
 export const uploadResume = async (req, res) => {
     try {
-        const user = await userService.getUserById(req.params.id);
-
-        singleUploader(req, res, async (err) => {
+        singleUploader(req, res, async function(err, data) {
             if (err) {
                 throw (err);
             }
-            // if the user already has a resume, then delete that one and upload the latest one
+            let user = await userService.getUserById(req.user.id);
+            
+            // if the user already has a resume, then delete that one from S3 bucket
             if(user.resume) {
                 let str = user.resume;
                 let len = str.length;
-                const fileName = str.substring(55, len);
-                await s3.deleteObject({Bucket: process.env.BUCKET_NAME, Key: fileName}).promise();
+                const fileName = str.substring(51, len);
+                await s3.deleteObject({Bucket: BUCKET_NAME, Key: fileName}).promise();
                 console.log("Deleted previous resume!");
             }
 
+            // store the file's link only inside database
             user.resume = req.file.location;
             await user.save();
+
+            return res.status(201).json({
+                success: true,
+                message: 'Successfully uploaded your resmue',
+                data: true,
+                err: {}
+            });
         });
-        return res.status(201).json({
-            success: true,
-            message: 'Successfully uploaded your resmue',
-            data: user,
-            err: {}
-        });
+        
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: 'Something went wrong with getting all, at user-controller layer!',
+            message: 'Something went wrong with uploadResume, at user-controller layer!',
             data: {},
             err: error
         });
@@ -131,14 +138,14 @@ export const getUser = async (req, res) => {
         const user = await userService.getUserById(req.body.id);
         return res.status(200).json({
             success: true,
-            message: 'successfully fetched the users',
+            message: 'successfully fetched the user',
             data: user,
             err: {}
         })
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: 'Something went wrong with getting all, at user-controller layer!',
+            message: 'Something went wrong with getUser, at user-controller layer!',
             data: {},
             err: error
         });

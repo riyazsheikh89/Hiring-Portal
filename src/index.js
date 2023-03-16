@@ -2,11 +2,11 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import passport from 'passport';
 
+import { PORT } from './config/env-variables.js';
 import { passportAuth } from './config/jwt-strategy.js';
 import connect from './config/db-config.js';
 import apiRoute from './routes/index.js';
 
-const PORT = process.env.PORT;
 const app = express();
 
 app.use(bodyParser.json());
@@ -19,7 +19,7 @@ app.use('/api', apiRoute);
 
 
 app.listen(PORT, async () =>{
-    console.log(`Server Started on port ${PORT}`);
+    console.log(`Server Started on port: ${PORT}`);
     await connect();
     console.log("mongoDB connected");
 });

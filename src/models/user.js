@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { JWT_SECRET_KEY } from '../config/env-variables.js'
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -49,7 +50,7 @@ userSchema.methods.genJWT = function generate() {
         id: this._id, 
         email: this.email,
         type: this.empType
-    }, `${process.env.JWT_SECRET_KEY}`, {expiresIn: '1D'});
+    }, JWT_SECRET_KEY, {expiresIn: '1D'});
 }
 
 const User = mongoose.model('User', userSchema);

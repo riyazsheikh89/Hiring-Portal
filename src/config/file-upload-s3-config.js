@@ -2,10 +2,12 @@ import aws from 'aws-sdk';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
 
+import { AWS_SECRET_ACCESS_KEY, ACCESS_KEY_ID, BUCKET_NAME, AWS_REGION } from '../config/env-variables.js';
+
 aws.config.update({
-    region: process.env.AWS_REGION,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    accessKeyId: process.env.ACCESS_KEY_ID
+    region: AWS_REGION,
+    secretAccessKey: AWS_SECRET_ACCESS_KEY,
+    accessKeyId: ACCESS_KEY_ID
 });
 
 const s3 = new aws.S3();
@@ -13,14 +15,14 @@ const s3 = new aws.S3();
 const upload = multer({
     storage: multerS3({
         s3: s3,
-        bucket: process.env.BUCKET_NAME,
+        bucket: BUCKET_NAME,
         acl: 'public-read',
         metadata: function(req, file, cb) {
             cb(null, {fieldName: file.fieldname})
         },
         key: function(req, file, cb) {
-            cb(null, file.originalname.replace(/ /g,''));    
-            //stored s3 file name will be the original name with no white space
+            cb(null, Date.now().toString()+file.originalname.replace(/ /g,''));
+            //store the file with the string datetime + original name having no white space
         }
     })
 });

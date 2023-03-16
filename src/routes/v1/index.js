@@ -8,10 +8,10 @@ const router = express.Router();
 
 router.post('/signup', signUp);  
 router.post('/login', login);
-router.post('/upload/:id', authenticate, uploadResume);
+router.post('/upload', authenticate, uploadResume);
 
-router.get('/users', getAllUser);
-router.get('/getuser', getUser);
+router.get('/users', authenticate, getAllUser);
+router.get('/getuser', authenticate, getUser);
 
 
 export default router;
