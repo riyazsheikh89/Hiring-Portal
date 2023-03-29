@@ -25,9 +25,10 @@ export const signUp = async (req, res) => {
             empType: req.body.type
         });
 
+        const {name, email, empType} = response;    // Object De-structuring
         return res.status(201).json({
             success: true,
-            data: response,
+            data: {name, email, empType},
             message: "Successfully signed up",
             err: {}
         });
